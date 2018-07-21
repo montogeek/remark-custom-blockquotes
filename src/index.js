@@ -12,7 +12,8 @@ module.exports = function customBlockquotes(options) {
 
       if (!textNode) return;
 
-      const className = mapping[textNode.substr(0, 2)];
+      const substr = textNode.substr(0, 2);
+      const className = mapping[substr];
 
       if (className) {
         node.type = 'blockquote';
@@ -23,18 +24,11 @@ module.exports = function customBlockquotes(options) {
           }
         };
 
-        node.children = [
-          {
-            type: 'paragraph',
-            children: [
-              {
-                ...children[0],
-                value: children[0].value.slice(3)
-              },
-              ...children.slice(1)
-            ]
-          }
-        ];
+        const r = new RegExp(`^\\${substr}\\s`, 'gm');
+
+        visit(node, 'text', function (cld) {
+          cld.value = cld.value.replace(r, ' ');
+        });
       }
     }
   };
